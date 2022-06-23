@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const authorsModel = require("../models/authorsModel")
-const booksModel = require("../models/blogsModel")
+const blogsModel = require("../models/blogsModel")
 
 const authentication = function(req, res, next){
     try{
@@ -34,9 +34,9 @@ const authorise = async function (req,res,next){
 
 
     let blogId = req.query.blogId
-    if (blogId.length < 24){
-        return res.send({msg: "enter valid blog id"})
-    }
+    // if (blogId.length < 24){
+    //     return res.send({msg: "enter valid blog id"})
+    // }
 
     let blog = await blogsModel.findById(blogId)
     if (!blog){

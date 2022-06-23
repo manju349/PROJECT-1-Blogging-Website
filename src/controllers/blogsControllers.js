@@ -1,7 +1,35 @@
 const blogsModel = require("../models/blogsModel")
+const mongoose = require("mongoose")
+const ObjectId = mongoose.Types.ObjectId;
+
+const isValid = function (value) {
+    if (typeof value === "undefined" || value === null) return false;
+    if (typeof value === "string" && value.trim().length === 0) return false;
+    return true;
+};
+
+const isValidObjectId = function (objectId) {
+    return mongoose.Types.ObjectId.isValid(objectId)
+}
+
+
 const createBlogs = async function (req, res) {
     try {
         let data = req.body;
+        if (!isValid(data.title)) return res.status(400).send({ status: false, msg: "title is Required" })
+
+        if (!isValid(data.body)) return res.status(400).send({ status: false, msg: "body is Required" })
+
+        if (!isValid(data.authorId)) return res.status(400).send({ status: false, msg: "authorId is Required" })
+
+        if (!isValidObjectId(data.authorId)) return res.status(400).send({ status: false, msg: "author is not valid" })
+
+        if (!isValid(data.tags)) return res.status(400).send({ status: false, msg: "tags is Required" })
+
+        if (!isValid(data.category)) return res.status(400).send({ status: false, msg: "category is Required" })
+
+        if (!isValid(data.subcategory)) return res.status(400).send({ status: false, msg: "subcategory is not valid" })
+
         if (Object.keys(data).length != 0) {
             let savedData = await blogsModel.create(data);
             res.status(201).send({ msg: savedData, msg: "blog successfully created" });
@@ -18,7 +46,7 @@ const getBlogs = async function (req, res) {
     try {
         let data = req.query
         let { authorId, category, tags, subcategory } = data
-        let blogsDetails = await blogsModel.find({ $and: [ {isDeleted: false}, {isPublished: true}], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
+        let blogsDetails = await blogsModel.find({ $and: [{ isDeleted: false }, { isPublished: true }], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
         if (!blogsDetails) {
             res.status(404).send({ status: false, msg: "no blog exist" })
