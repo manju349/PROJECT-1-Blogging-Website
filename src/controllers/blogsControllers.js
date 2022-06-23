@@ -13,32 +13,19 @@ const createBlogs = async function (req, res) {
     }
 };
 
-// - Returns all blogs in the collection that aren't deleted and are published
-// - Return the HTTP status 200 if any documents are found. The response structure should be like [this](#successful-response-structure) 
-// - If no documents are found then return an HTTP status 404 with a response like [this](#error-response-structure) 
-// - Filter blogs list by applying filters. Query param can have any combination of below filters.
-//   - By author Id
-//   - By category
-//   - List of blogs that have a specific tag
-//   - List of blogs that have a specific subcategory
-// example of a query url: blogs?filtername=filtervalue&f2=fv2
 
 const getBlogs = async function (req, res) {
     try {
-        let authorId = req.query.authorId;
-        let category = req.query.category;
-        let tags = req.query.tags;
-        let subcategory = req.query.subcategory;
+        let data = req.query
+        let { authorId, category, tags, subcategory } = data
+        let blogsDetails = await blogsModel.find({ $and: [ {isDeleted: false}, {isPublished: true}], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
-        let delOrPublish = await blogsModel.find({ $and: [{ isDeleted: false }, { isPublished: true }] })
-        if (!delOrPublish)
-            return res.status(404).send({ status: false, msg: "No such user exists" });
-        res.status(200).send({ status: true, data: delOrPublish })
-
-        let userFilter = await blogsModel.find({ $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] }).populate("authorId")
-        if (!userFilter)
-            return res.status(404).send({ status: false, msg: "No such user exists" });
-        res.status(200).send({ status: true, data: userFilter });
+        if (!blogsDetails) {
+            res.status(404).send({ status: false, msg: "no blog exist" })
+        }
+        else {
+            res.status(200).send({ status: true, data: blogsDetails })
+        }
     }
     catch (error) {
         console.log("Server Error:", error.message)
