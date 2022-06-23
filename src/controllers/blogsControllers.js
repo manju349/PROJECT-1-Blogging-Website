@@ -94,7 +94,7 @@ const queryDeleted = async function (req, res) {
             return res.status(404).send({ status: false, msg: "Data doesn't exit!!" })
         }
 
-        if (Object.values(data).length <= 0) {
+        if (!data) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
 

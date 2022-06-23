@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const authorsModel = require("../models/authorsModel")
+// const authorsModel = require("../models/authorsModel")
 const blogsModel = require("../models/blogsModel")
 
 const authentication = function(req, res, next){
@@ -24,31 +24,63 @@ const authentication = function(req, res, next){
 module.exports.authentication = authentication
 
 
-const authorise = async function (req,res,next){
+const Authorisation1 = async function (req, res, next) {
+    try {
+        let token = req.headers["x-api-key"];
+        if (!token) {
+            return res.status(400).send({ Error: "Enter x-api-key In Header" });
+        }
+        let decodedToken = jwt.verify(token, "room-9")
+        let blogId = req.params.blogId;
 
-    let token = req.headers["x-api-key"];
-    if (!token) return res.send({status: false, msg: "token is missing"})
-
-    let decodedtoken = jwt.verify(token, "room-9");
-    if(!decodedtoken) return res.send({ status: false, msg: "invalid token"})
-
-
-    let blogId = req.query.blogId
-    // if (blogId.length < 24){
-    //     return res.send({msg: "enter valid blog id"})
-    // }
-
-    let blog = await blogsModel.findById(blogId)
-    if (!blog){
-        return res.send("blog doesnt exist")
+        // if (blogId.length < 24) {
+        //     return res.status(404).send({ msg: "Enter Valid Blog-Id" });
+        // }
+        let decoded = decodedToken.authorId
+        let blog = await blogsModel.findById(blogId);
+        if (!blog) {
+            return res.status(404).send("Blog doesn't exist");
+        }
+        let author = blog.authorId.toString()
+        console.log(author)
+        if (author != decoded) {
+            return res.status(404).send("Not Authorised!!")
+        }
+        next()
     }
-
-    let decoded = decodedtoken.authorId
-    let author = blog.authorId
-    if (author != decoded){
-        return res.send("not authorised")
+    catch (error) {
+        return res.status(500).send({ msg: error.message });
     }
-    next ()
+}
+module.exports.Authorisation1 = Authorisation1;
+
+const Authorisation2 = async function (req, res, next) {
+    try {
+        let token = req.headers["x-api-key"];
+        if (!token) {
+            return res.status(400).send({ Error: "Enter x-api-key In Header" });
+        }
+        let decodedToken = jwt.verify(token, "room-9")
+        // let blogId = req.query.blogId;
+
+        // // if (blogId.length < 24) {
+        // //     return res.status(404).send({ msg: "Enter Valid Blog-Id" });
+        // // }
+        // let decoded = decodedToken.authorId
+        // let blog = await blogsModel.findById(blogId);
+        // if (!blog) {
+        //     return res.status(404).send("Blog doesn't exist");
+        // }
+        // let author = blog.authorId.toString()
+        // console.log(author)
+        // if (author != decoded) {
+        //     return res.status(404).send("Not Authorised!!")
+        // }
+        next()
+    }
+    catch (error) {
+        return res.status(500).send({ msg: error.message });
+    }
 }
 
-module.exports.authorise=authorise
+module.exports.Authorisation2=Authorisation2
