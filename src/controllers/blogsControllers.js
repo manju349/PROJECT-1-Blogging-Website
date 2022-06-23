@@ -18,9 +18,9 @@ const getBlogs = async function (req, res) {
     try {
         let data = req.query
         let { authorId, category, tags, subcategory } = data
-        let blogsDetails = await blogsModel.find({ isDeleted: false, isPublished: true, $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
+        let blogsDetails = await blogsModel.find({ $and: [ {isDeleted: false}, {isPublished: true}], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
-        if (Object.keys(blogsDetails).length != 0) {
+        if (!blogsDetails) {
             res.status(404).send({ status: false, msg: "no blog exist" })
         }
         else {
