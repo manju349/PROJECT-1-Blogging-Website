@@ -39,12 +39,12 @@ const Authorisation1 = async function (req, res, next) {
         let decoded = decodedToken.authorId
         let blog = await blogsModel.findById(blogId);
         if (!blog) {
-            return res.status(404).send("Blog doesn't exist");
+            return res.status(404).send({status: false, msg: "Blog doesn't exist"});
         }
         let author = blog.authorId.toString()
         console.log(author)
         if (author != decoded) {
-            return res.status(404).send("Not Authorised!!")
+            return res.status(404).send({status: false, msg: "Not Authorised!"})
         }
         next()
     }
@@ -61,21 +61,20 @@ const Authorisation2 = async function (req, res, next) {
             return res.status(400).send({ Error: "Enter x-api-key In Header" });
         }
         let decodedToken = jwt.verify(token, "room-9")
-        // let blogId = req.query.blogId;
-
-        // // if (blogId.length < 24) {
-        // //     return res.status(404).send({ msg: "Enter Valid Blog-Id" });
-        // // }
-        // let decoded = decodedToken.authorId
-        // let blog = await blogsModel.findById(blogId);
-        // if (!blog) {
-        //     return res.status(404).send("Blog doesn't exist");
-        // }
-        // let author = blog.authorId.toString()
-        // console.log(author)
-        // if (author != decoded) {
-        //     return res.status(404).send("Not Authorised!!")
-        // }
+        let blogId = req.query.blogId;
+        if (!blogId){
+            return res.statu(400).send({msg: "enter blog id"})
+        }
+        let decoded = decodedToken.authorId
+        let blog = await blogsModel.findById(blogId);
+        if (!blog) {
+            return res.status(404).send({status: false, msg: "Blog doesn't exist"});
+        }
+        let author = blog.authorId.toString()
+        console.log(author)
+        if (author != decoded) {
+            return res.status(404).send({status: false, msg: "Not Authorised!"})
+        }
         next()
     }
     catch (error) {
@@ -84,3 +83,6 @@ const Authorisation2 = async function (req, res, next) {
 }
 
 module.exports.Authorisation2=Authorisation2
+
+
+//62b19b7100e308d3100c1a66

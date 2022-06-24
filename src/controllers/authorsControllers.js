@@ -18,7 +18,7 @@ const createAuthor = async function (req, res) {
 
         if (!isValid(author.password)) return res.status(400).send({ status: false, msg: "password is Required" })
 
-        if (!isValid(author.email)) return res.status(400).send({ status: false, msg: "email is Required" })
+        //if (!isValid(author.email)) return res.status(400).send({ status: false, msg: "email is Required" })
 
         if (!isValid(author.email)) return res.status(400).send({ status: false, msg: "email is not valid" })
 
@@ -39,6 +39,14 @@ const authorLogin = async function(req, res){
     try{
         let authorName = req.body.email;
         let password = req.body.password;
+
+        if (!authorName){
+            return res.status(400).send({msg: "enter email id"})
+        }
+
+        if (!password){
+            return res.status(400).send({msg: "enter the password"})
+        }
 
         let user = await authorModel.findOne({email: authorName, password: password});
         if(!user){

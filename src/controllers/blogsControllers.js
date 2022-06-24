@@ -1,6 +1,6 @@
 const blogsModel = require("../models/blogsModel")
 const mongoose = require("mongoose")
-const ObjectId = mongoose.Types.ObjectId;
+const objectId = mongoose.Types.ObjectId;
 
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
@@ -12,23 +12,14 @@ const isValidObjectId = function (objectId) {
     return mongoose.Types.ObjectId.isValid(objectId)
 }
 
-
 const createBlogs = async function (req, res) {
     try {
         let data = req.body;
         if (!isValid(data.title)) return res.status(400).send({ status: false, msg: "title is Required" })
-
         if (!isValid(data.body)) return res.status(400).send({ status: false, msg: "body is Required" })
-
         if (!isValid(data.authorId)) return res.status(400).send({ status: false, msg: "authorId is Required" })
-
         if (!isValidObjectId(data.authorId)) return res.status(400).send({ status: false, msg: "author is not valid" })
-
-        if (!isValid(data.tags)) return res.status(400).send({ status: false, msg: "tags is Required" })
-
         if (!isValid(data.category)) return res.status(400).send({ status: false, msg: "category is Required" })
-
-        if (!isValid(data.subcategory)) return res.status(400).send({ status: false, msg: "subcategory is not valid" })
 
         if (Object.keys(data).length != 0) {
             let savedData = await blogsModel.create(data);
@@ -48,7 +39,7 @@ const getBlogs = async function (req, res) {
         let { authorId, category, tags, subcategory } = data
         let blogsDetails = await blogsModel.find({ $and: [{ isDeleted: false }, { isPublished: true }], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
-        if (!blogsDetails) {
+        if (!isValid(blogsDetails)) {
             res.status(404).send({ status: false, msg: "no blog exist" })
         }
         else {
@@ -66,10 +57,11 @@ const deleteBlogs = async function (req, res) {
     try {
         let blogId = req.params.blogId
         if (blogId.length < 24) {
+            ret
         }
 
         let validBlogId = await blogsModel.findById(blogId)
-        if (!validBlogId) {
+        if (!isValid(validBlogId)) {
             return res.status(404).send({ msg: "blog id not present" })
         }
         let blogDelete = await blogsModel.findOneAndUpdate({ _id: blogId }, { isDeleted: true }, { new: true })
@@ -83,18 +75,18 @@ const deleteBlogs = async function (req, res) {
     }
 }
 
-
 const queryDeleted = async function (req, res) {
     try {
         let data = req.query;
+        let { authorId, category, tags, subcategory } = data
         let blog = req.query.blogId;
 
         let valid = await blogsModel.findOne(data);
-        if (!valid) {
+        if (!isValid(valid)) {
             return res.status(404).send({ status: false, msg: "Data doesn't exit!!" })
         }
 
-        if (!data) {
+        if (!isValid(data)) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
 
@@ -105,7 +97,7 @@ const queryDeleted = async function (req, res) {
         if (deleted.isDeleted == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: " " });
         }
-        return res.status(200).send({ status: true, data: deleted });
+        return res.status(200).send({ status: true, msg: "data successfuly deleted", data: deleted });
     }
     catch (error) {
         return res.status(500).send({ error: error.message });
@@ -119,7 +111,7 @@ const updateBlogs = async function (req, res) {
         let BlogId = req.params.blogId
         let userData = req.body
 
-        if (Object.values(userData).length <= 0) {
+        if (!isValid(userData)) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
         let { body, title, tags, subcategory, isPublished, isDeleted } = userData
@@ -139,20 +131,40 @@ const updateBlogs = async function (req, res) {
 
         }, { new: true });
 
+        if (!isValid(updateNewBlog)) {
+            return res.status(400).send({ msg: "request invalid" })
+        }
+
         if (updateNewBlog.isPublished == true) {
             let update = await blogsModel.findOneAndUpdate({ _id: BlogId }, { publishedAt: new String(Date()) })
+
+            if (!update) {
+                return res.status(400).send({ msg: "not updated" })
+            }
         }
 
         if (updateNewBlog.isPublished == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: BlogId }, { publishedAt: null })
+
+            if (!update) {
+                return res.status(400).send({ msg: "not updated" })
+            }
         }
 
         if (updateNewBlog.isDeleted == true) {
             res.status(404).send({ status: false, msg: "blog not found" })
+
+            if (!update) {
+                return res.status(400).send({ msg: "not updated" })
+            }
         }
 
         if (updateNewBlog.isDeleted == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: BlogId }, { deletedAt: new String(Date()) })
+
+            if (!update) {
+                return res.status(400).send({ msg: "not updated" })
+            }
         }
         return res.status(200).send({ status: true, data: updateNewBlog, msg: "blog updated successfuly" })
     }
@@ -167,3 +179,6 @@ module.exports.queryDeleted = queryDeleted;
 module.exports.createBlogs = createBlogs
 module.exports.getBlogs = getBlogs
 module.exports.deleteBlogs = deleteBlogs
+
+//........................................................
+// end of the code.
