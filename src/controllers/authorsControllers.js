@@ -16,12 +16,13 @@ const isValid = function (value) {
 const createAuthor = async function (req, res) {
     try {
         let author = req.body
-        if (!isValid(author.fname)) return res.status(400).send({ status: false, msg: "fname is Required" })
+        if (!isValid(author.fname)) return res.status(400).send({ status: false, msg: "first name is Required" })
 
-        if (!isValid(author.lname)) return res.status(400).send({ status: false, msg: "lname is Required" })
+        if (!isValid(author.lname)) return res.status(400).send({ status: false, msg: "last name is Required" })
         
         if (!isValid(author.title)) return res.status(400).send({ status: false, msg: "title is Required" })
-        if (author.title1!=="Mr"&& author.title1!=="Mrs"&&author.title1!=="Miss") return res.status(400).send({ status: false, msg: "title should be Mr Mrs or Miss" })
+
+        if (author.title !=="Mr"&& author.title !=="Mrs"&&author.title !=="Miss") return res.status(400).send({ status: false, msg: "title should be Mr Mrs or Miss" })
 
         if (!isValid(author.password)) return res.status(400).send({ status: false, msg: "password is Required" })
 
@@ -31,7 +32,7 @@ const createAuthor = async function (req, res) {
 
         if (author) {
             let authorCreated = await authorModel.create(author)
-            res.status(201).send({ data: authorCreated, msg: "author successfully created" })
+            res.status(201).send({ msg: "author successfully created", data: authorCreated })
         } else res.send(400).send({ msg: "bad request" })
     }
     catch (error) {
