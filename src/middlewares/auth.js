@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken')
+const ObjectId = require('mongoose').Types.ObjectId
 // const authorsModel = require("../models/authorsModel")
 const blogsModel = require("../models/blogsModel")
+
+let isValidObjectId = function (objectId) {
+    if (!ObjectId.isValid(objectId)) return false;
+    return true;
+}
 
 const authentication = function(req, res, next){
     try{
@@ -32,7 +38,16 @@ const Authorisation1 = async function (req, res, next) {
         }
         let decodedToken = jwt.verify(token, "room-9")
         let blogId = req.params.blogId;
-
+        if (blogId===':blogId'){
+            return res.status(404).send({msg: "enter a blog id"})
+        }
+        console.log(blogId)
+        if (!req.params) {
+            return res.status(404).send({msg: "somethings"})
+        }
+        if (!isValidObjectId(blogId)){
+            return res.status(400).send({msg: "blog id not valid"})
+        }
         // if (blogId.length < 24) {
         //     return res.status(404).send({ msg: "Enter Valid Blog-Id" });
         // }
@@ -44,7 +59,7 @@ const Authorisation1 = async function (req, res, next) {
         let author = blog.authorId.toString()
         console.log(author)
         if (author != decoded) {
-            return res.status(404).send({status: false, msg: "Not Authorised!"})
+            return res.status(401).send({status: false, msg: "Not Authorised!"})
         }
         next()
     }

@@ -8,6 +8,14 @@ const isValid = function (value) {
     return true;
 };
 
+let isValidObjectId = function (objectId) {
+    if (!ObjectId.isValid(objectId)) return false;
+    return true;
+}
+
+
+
+
 // const //isValidObjectId = function (ObjectId) {
 //     return mongoose.Types.ObjectId.isValid(ObjectId)
 // }
@@ -110,16 +118,16 @@ const updateBlogs = async function (req, res) {
     try {
         let blogId = req.params.blogId
         let userData = req.body
-
+        
         if (!userData) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
         let { body, title, tags, subcategory, isPublished, isDeleted } = userData
 
-        if (!blogId){
-            return res.status(404).send({msg: "blog id not found"})
+        if (!isValidObjectId(blogId)){
+            return res.status(404).send({msg: "blog id not available"})
         }
-        if (Object.keys(blogId).length < 24) {
+        if (blogId.length < 24) {
             return res.status(403).send({ msg: "enter valid blog id" })
         }
         let user = await blogsModel.findById(blogId)
