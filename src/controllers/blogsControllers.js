@@ -1,6 +1,6 @@
 const blogsModel = require("../models/blogsModel")
 const mongoose = require("mongoose")
-const objectId = mongoose.Types.ObjectId;
+const ObjectId = mongoose.Types.ObjectId;
 
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
@@ -8,9 +8,9 @@ const isValid = function (value) {
     return true;
 };
 
-const isValidObjectId = function (objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId)
-}
+// const //isValidObjectId = function (ObjectId) {
+//     return mongoose.Types.ObjectId.isValid(ObjectId)
+// }
 
 const createBlogs = async function (req, res) {
     try {
@@ -48,7 +48,7 @@ const getBlogs = async function (req, res) {
     }
     catch (error) {
         console.log("Server Error:", error.message)
-        res.status(500).send({ msg: "Server Error", error: error.message })
+        return res.status(500).send({ msg: "Server Error", error: error.message })
     }
 };
 
@@ -57,7 +57,7 @@ const deleteBlogs = async function (req, res) {
     try {
         let blogId = req.params.blogId
         if (blogId.length < 24) {
-            ret
+            return res.status(400).send({msg: "invalid blog id"})
         }
 
         let validBlogId = await blogsModel.findById(blogId)
@@ -92,7 +92,7 @@ const queryDeleted = async function (req, res) {
 
         let deleted = await blogsModel.findOneAndUpdate(data, { isDeleted: true }, { new: true });
         if (deleted.isDeleted == true) {
-            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: data });
+            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: new String(Date()) });
         }
         if (deleted.isDeleted == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: " " });
@@ -108,23 +108,25 @@ const queryDeleted = async function (req, res) {
 const updateBlogs = async function (req, res) {
 
     try {
-        let BlogId = req.params.blogId
+        let blogId = req.params.blogId
         let userData = req.body
 
-        if (!isValid(userData)) {
+        if (!userData) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
         let { body, title, tags, subcategory, isPublished, isDeleted } = userData
 
-        if (BlogId.length < 24) {
+        if (!blogId){
+            return res.status(404).send({msg: "blog id not found"})
+        }
+        if (Object.keys(blogId).length < 24) {
             return res.status(403).send({ msg: "enter valid blog id" })
         }
-
-        let user = await blogsModel.findById(BlogId)
+        let user = await blogsModel.findById(blogId)
         if (!user) {
             return res.status(404).send({ status: false, msg: "no blog exist" })
         }
-        let updateNewBlog = await blogsModel.findByIdAndUpdate({ _id: BlogId }, {
+        let updateNewBlog = await blogsModel.findByIdAndUpdate({ _id: blogId }, {
 
             $set: { body: body, title: title, isPublished: isPublished, isDeleted: isDeleted },
             $push: { tags: tags, subcategory: subcategory },
@@ -136,7 +138,7 @@ const updateBlogs = async function (req, res) {
         }
 
         if (updateNewBlog.isPublished == true) {
-            let update = await blogsModel.findOneAndUpdate({ _id: BlogId }, { publishedAt: new String(Date()) })
+            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { publishedAt: new String(Date()) })
 
             if (!update) {
                 return res.status(400).send({ msg: "not updated" })
@@ -144,7 +146,7 @@ const updateBlogs = async function (req, res) {
         }
 
         if (updateNewBlog.isPublished == false) {
-            let update = await blogsModel.findOneAndUpdate({ _id: BlogId }, { publishedAt: null })
+            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { publishedAt: null })
 
             if (!update) {
                 return res.status(400).send({ msg: "not updated" })
@@ -160,7 +162,7 @@ const updateBlogs = async function (req, res) {
         }
 
         if (updateNewBlog.isDeleted == false) {
-            let update = await blogsModel.findOneAndUpdate({ _id: BlogId }, { deletedAt: new String(Date()) })
+            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { deletedAt: new String(Date()) })
 
             if (!update) {
                 return res.status(400).send({ msg: "not updated" })
