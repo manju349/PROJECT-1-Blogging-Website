@@ -9,7 +9,7 @@ const { authentication, Authorisation1, Authorisation2} = require("../middleware
 
 
 router.post("/authors", authorController.createAuthor)
-router.post("/blogs",  blogsController.createBlogs)
+router.post("/blogs",  authentication,blogsController.createBlogs)
 router.post("/login", authorController.authorLogin)
 router.get("/blogs", authentication, blogsController.getBlogs)
 router.put("/blogs/:blogId", authentication, Authorisation1,  blogsController.updateBlogs)

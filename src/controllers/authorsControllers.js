@@ -2,16 +2,12 @@ const authorModel = require('../models/authorsModel')
 const jwt = require("jsonwebtoken")
 let regex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
 
+
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
     return true;
 };
-
-// let isValidEnum= function(value){
-//     let title=["Mr", "Mrs", "Miss"];
-//   return  title.includes(value) !== -1;
-// }
 
 const createAuthor = async function (req, res) {
     try {
@@ -21,7 +17,7 @@ const createAuthor = async function (req, res) {
         if (!isValid(author.lname)) return res.status(400).send({ status: false, msg: "lname is Required" })
         
         if (!isValid(author.title)) return res.status(400).send({ status: false, msg: "title is Required" })
-        if (author.title1!=="Mr"&& author.title1!=="Mrs"&&author.title1!=="Miss") return res.status(400).send({ status: false, msg: "title should be Mr Mrs or Miss" })
+        if (author.title!=="Mr"&& author.title!=="Mrs"&&author.title!=="Miss") return res.status(400).send({ status: false, msg: "title should be Mr Mrs or Miss" })
 
         if (!isValid(author.password)) return res.status(400).send({ status: false, msg: "password is Required" })
 
@@ -31,7 +27,7 @@ const createAuthor = async function (req, res) {
 
         if (author) {
             let authorCreated = await authorModel.create(author)
-            res.status(201).send({ data: authorCreated, msg: "author successfully created" })
+            res.status(201).send({ msg: "author successfully created", data: authorCreated  })
         } else res.send(400).send({ msg: "bad request" })
     }
     catch (error) {

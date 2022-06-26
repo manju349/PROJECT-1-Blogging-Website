@@ -8,17 +8,9 @@ const isValid = function (value) {
     return true;
 };
 
-let isValidObjectId = function (objectId) {
-    if (!ObjectId.isValid(objectId)) return false;
-    return true;
+const isValidObjectId = function (ObjectId) {
+    return mongoose.Types.ObjectId.isValid(ObjectId)
 }
-
-
-
-
-// const //isValidObjectId = function (ObjectId) {
-//     return mongoose.Types.ObjectId.isValid(ObjectId)
-// }
 
 const createBlogs = async function (req, res) {
     try {
@@ -31,7 +23,7 @@ const createBlogs = async function (req, res) {
 
         if (Object.keys(data).length != 0) {
             let savedData = await blogsModel.create(data);
-            res.status(201).send({ msg: savedData, msg: "blog successfully created" });
+            res.status(201).send({ msg: "blog successfully created",data: savedData });
         } else res.send(400).send({ msg: "bad request" })
     }
     catch (error) {
@@ -74,12 +66,12 @@ const deleteBlogs = async function (req, res) {
         }
         let blogDelete = await blogsModel.findOneAndUpdate({ _id: blogId }, { isDeleted: true }, { new: true })
         if (blogDelete.isDeleted == true) {
-            return res.status(200).send({ status: true, msg: "blog is deleted" })
+            return res.status(200).send({ status: true, msg: "blog is deleted", data: blogDelete })
         }
     }
     catch (error) {
         console.log("server error", error.message)
-        res.satus(500).send({ msg: "server error", error: error.message })
+        res.status(500).send({ msg: "server error", error: error.message })
     }
 }
 
@@ -102,6 +94,7 @@ const queryDeleted = async function (req, res) {
         if (deleted.isDeleted == true) {
             let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: new String(Date()) });
         }
+
         if (deleted.isDeleted == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: " " });
         }
@@ -170,17 +163,18 @@ const updateBlogs = async function (req, res) {
         }
 
         if (updateNewBlog.isDeleted == false) {
-            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { deletedAt: new String(Date()) })
+            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { deletedAt: null })
 
             if (!update) {
                 return res.status(400).send({ msg: "not updated" })
             }
         }
-        return res.status(200).send({ status: true, data: updateNewBlog, msg: "blog updated successfuly" })
+        
+        return res.status(200).send({ status: true, msg: "blog updated successfuly", data: updateNewBlog  })
     }
     catch (error) {
         console.log("server error", error.message)
-        res.satus(500).send({ msg: "server error", error: error.message })
+        res.status(500).send({ msg: "server error", error: error.message })
     }
 }
 
