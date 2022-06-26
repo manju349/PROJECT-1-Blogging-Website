@@ -40,7 +40,7 @@ const getBlogs = async function (req, res) {
         let blogsDetails = await blogsModel.find({ $and: [{ isDeleted: false }, { isPublished: true }], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
         if (!isValid(blogsDetails)) {
-            res.status(404).send({ status: false, msg: "no blog exist" })
+            res.status(404).send({ status: false, msg: "no such blog exist" })
         }
         else {
             res.status(200).send({ status: true, data: blogsDetails })
@@ -67,7 +67,7 @@ const updateBlogs = async function (req, res) {
             return res.status(404).send({msg: "blog id not available"})
         }
         if (blogId.length < 24) {
-            return res.status(403).send({ msg: "enter valid blog id" })
+            return res.status(400).send({ msg: "enter valid blog id" })
         }
         let user = await blogsModel.findById(blogId)
         if (!user) {
@@ -133,7 +133,7 @@ const deleteBlogs = async function (req, res) {
 
         let validBlogId = await blogsModel.findById(blogId)
         if (!isValid(validBlogId)) {
-            return res.status(404).send({ msg: "blog id not present" })
+            return res.status(404).send({ msg: "No such blog exists" })
         }
         let blogDelete = await blogsModel.findOneAndUpdate({ _id: blogId }, { isDeleted: true }, { new: true })
         if (blogDelete.isDeleted == true) {
@@ -154,7 +154,7 @@ const queryDeleted = async function (req, res) {
 
         let valid = await blogsModel.findOne(data);
         if (!isValid(valid)) {
-            return res.status(404).send({ status: false, msg: "Data cant be found!!" })
+            return res.status(404).send({ status: false, msg: "Data can't be found!!" })
         }
 
         if (!isValid(data)) {

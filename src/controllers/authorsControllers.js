@@ -53,7 +53,7 @@ const authorLogin = async function(req, res){
 
         let user = await authorModel.findOne({email: authorName, password: password});
         if(!user){
-            return res.status(404).send({status: false, msg:"User Name or the Password is not correct"});
+            return res.status(404).send({status: false, msg:"User not Registered, Please Sign Up"});
         }
 
         let token = jwt.sign(
