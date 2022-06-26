@@ -17,7 +17,7 @@ const createAuthor = async function (req, res) {
         if (!isValid(author.lname)) return res.status(400).send({ status: false, msg: "lname is Required" })
         
         if (!isValid(author.title)) return res.status(400).send({ status: false, msg: "title is Required" })
-        if (author.title!=="Mr"&& author.title!=="Mrs"&&author.title!=="Miss") return res.status(400).send({ status: false, msg: "title should be Mr Mrs or Miss" })
+        if (author.title!=="Mr"&& author.title!=="Mrs"&&author.title!=="Miss") return res.status(400).send({ status: false, msg: "title should be Mr, Mrs or Miss" })
 
         if (!isValid(author.password)) return res.status(400).send({ status: false, msg: "password is Required" })
 
@@ -25,7 +25,7 @@ const createAuthor = async function (req, res) {
         let checkMail = regex.test(author.email) 
         if (checkMail == false ) return res.status(400).send({ status: false, msg: "email is not valid" })
 
-        if (author) {
+        if (Object.keys(author).length != 0) {
             let authorCreated = await authorModel.create(author)
             res.status(201).send({ msg: "author successfully created", data: authorCreated  })
         } else res.send(400).send({ msg: "bad request" })
