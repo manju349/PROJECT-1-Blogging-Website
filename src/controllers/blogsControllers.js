@@ -59,7 +59,7 @@ const updateBlogs = async function (req, res) {
         let userData = req.body
         let { body, title, tags, subcategory, isPublished, isDeleted } = userData
         
-        if (Object.keys(userData)!=0) {
+        if (!userData) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
         
