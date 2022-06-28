@@ -39,13 +39,17 @@ const getBlogs = async function (req, res) {
     try {
         let data = req.query
         let { authorId, category, tags, subcategory } = data   // DESTRUCTURING
+
+        if (!data){
+            return res.status(404).send({status: true, msg: "input data missing"})
+        }
         let blogsDetails = await blogsModel.find({ $and: [{ isDeleted: false }, { isPublished: true }], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
-        if (!isValid(blogsDetails)) {
-            res.status(404).send({ status: false, msg: "no such blog exist" })
+        if (!blogsDetails) {
+            return res.status(404).send({ status: false, msg: "no such blog exist" })
         }
         else {
-            res.status(200).send({ status: true,data: blogsDetails })
+            return res.status(200).send({ status: true, data: blogsDetails })
         }
     }
     catch (error) {
