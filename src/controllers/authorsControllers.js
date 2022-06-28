@@ -25,6 +25,10 @@ const createAuthor = async function (req, res) {
         let checkMail = regex.test(author.email) 
         if (checkMail == false ) return res.status(400).send({ status: false, msg: "email is not valid" })
 
+        let emailCheck = await authorModel.findOne({ email: author.email })
+        if (emailCheck) return res.status(400).send({ status: false, msg: "email already used" })
+
+
         if (Object.keys(author).length != 0) {
             let authorCreated = await authorModel.create(author)
             res.status(201).send({ msg: "author successfully created", data: authorCreated  })
@@ -42,10 +46,12 @@ const authorLogin = async function(req, res){
     try{
         let authorName = req.body.email;
         let password = req.body.password;
-
         if (!authorName){
             return res.status(400).send({msg: "enter email id"})
         }
+        if (!isValid(authorName)) return res.status(400).send({ status: false, msg: "email is not valid" })
+        let checkMail = regex.test(authorName) 
+        if (checkMail == false ) return res.status(400).send({ status: false, msg: "email is not valid" })
 
         if (!password){
             return res.status(400).send({msg: "enter the password"})

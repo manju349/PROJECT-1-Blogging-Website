@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const ObjectId = require('mongoose').Types.ObjectId
-// const authorsModel = require("../models/authorsModel")
 const blogsModel = require("../models/blogsModel")
 
 let isValidObjectId = function (objectId) {
@@ -37,20 +36,6 @@ const Authorisation1 = async function (req, res, next) {
             return res.status(400).send({ Error: "Token must be present" });
         }
         let decodedToken = jwt.verify(token, "room-9")
-        // let blogId = req.params.blogId;
-        // if (blogId===':blogId'){
-        //     return res.status(404).send({msg: "enter a blog id"})
-        // }
-        // console.log(blogId)
-        // if (!blogId) {
-        //     return res.status(404).send({msg: "blog id doesnt exist"})
-        // }
-        // if (!isValidObjectId(blogId)){
-        //     return res.status(400).send({msg: "blog id not valid"})
-        // }
-        // // if (blogId.length < 24) {
-        // //     return res.status(404).send({ msg: "Enter Valid Blog-Id" });
-        // // }
         let blogId = req.params.blogId;
         if (!blogId){
             return res.status(400).send({msg: "enter blog id"})

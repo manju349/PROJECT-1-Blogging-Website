@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const ObjectId = mongoose.Schema.Types.ObjectId
 
 const blogsSchema = new mongoose.Schema({
@@ -40,13 +39,13 @@ const blogsSchema = new mongoose.Schema({
     },
     
     deletedAt:{
-        type: String,
-        default: "Date"
+        type: Date,
+        default: null
     },
 
     publishedAt:{
-        type: String,
-        default: "Date"
+        type: Date,
+        default: null
     },
 
     isPublished: {
@@ -54,6 +53,5 @@ const blogsSchema = new mongoose.Schema({
         default: false
     }
 }, { timestamps: true });
-
 
 module.exports = mongoose.model('blogs', blogsSchema)

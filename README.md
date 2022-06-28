@@ -58,7 +58,6 @@ example of a query url: blogs?filtername=filtervalue&f2=fv2
 - If the blog document doesn't exist then return an HTTP status of 404 with a body like [this](#error-response-structure)
 
 ## Phase II
-
 - Add authentication and authroisation feature
 
 ### POST /login
@@ -107,7 +106,7 @@ yaml
 
 
 
-
+62b1a2369027fe29b25c1ae5
 
 
 ## Collections

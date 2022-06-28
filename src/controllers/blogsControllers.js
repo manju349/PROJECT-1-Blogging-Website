@@ -53,7 +53,6 @@ const getBlogs = async function (req, res) {
 };
 
 const updateBlogs = async function (req, res) {
-
     try {
         let blogId = req.params.blogId
         let userData = req.body
@@ -77,7 +76,6 @@ const updateBlogs = async function (req, res) {
 
             $set: { body: body, title: title, isPublished: isPublished, isDeleted: isDeleted },
             $push: { tags: tags, subcategory: subcategory },
-
         }, { new: true });
 
         if (!isValid(updateNewBlog)) {
@@ -152,7 +150,7 @@ const queryDeleted = async function (req, res) {
         let { authorId, category, tags, subcategory } = data
         let blog = req.query.blogId;
 
-        let valid = await blogsModel.findOne(data);
+        let valid = await blogsModel.find(data);
         if (!isValid(valid)) {
             return res.status(404).send({ status: false, msg: "Data can't be found!!" })
         }
@@ -161,13 +159,13 @@ const queryDeleted = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
 
-        let deleted = await blogsModel.findOneAndUpdate(data, { isDeleted: true }, { new: true });
+        let deleted = await blogsModel.findAndModify(data, { isDeleted: true }, { new: true });
         if (deleted.isDeleted == true) {
-            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: new String(Date()) });
+            let update = await blogsModel.findAndModify({ _id: blog }, { deletedAt: new String(Date()) });
         }
 
         if (deleted.isDeleted == false) {
-            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: " " });
+            let update = await blogsModel.findAndModify({ _id: blog }, { deletedAt: " " });
         }
         return res.status(200).send({ status: true, msg: "data successfuly deleted", data: deleted });
     }
@@ -177,8 +175,6 @@ const queryDeleted = async function (req, res) {
 };
 
 
-
-
 module.exports.updateBlogs = updateBlogs
 module.exports.queryDeleted = queryDeleted;
 module.exports.createBlogs = createBlogs
@@ -186,5 +182,3 @@ module.exports.getBlogs = getBlogs
 module.exports.deleteBlogs = deleteBlogs
 
 //........................................................
-// end of the code.
-//..........
