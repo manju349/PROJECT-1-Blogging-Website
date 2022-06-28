@@ -12,6 +12,7 @@ const isValidObjectId = function (ObjectId) {
     return mongoose.Types.ObjectId.isValid(ObjectId)
 }
 
+// CREATE BLOGS
 const createBlogs = async function (req, res) {
     try {
         let data = req.body;
@@ -33,10 +34,11 @@ const createBlogs = async function (req, res) {
 };
 
 
+// GET THE LIST OF BLOGS AFTER LOGGING IN
 const getBlogs = async function (req, res) {
     try {
         let data = req.query
-        let { authorId, category, tags, subcategory } = data
+        let { authorId, category, tags, subcategory } = data   // DESTRUCTURING
         let blogsDetails = await blogsModel.find({ $and: [{ isDeleted: false }, { isPublished: true }], $or: [{ authorId: authorId }, { category: category }, { tags: tags }, { subcategory: subcategory }] })
 
         if (!isValid(blogsDetails)) {
@@ -52,6 +54,8 @@ const getBlogs = async function (req, res) {
     }
 };
 
+
+// UPDATE USERS BLOG AFTER LOGGING IN
 const updateBlogs = async function (req, res) {
     try {
         let blogId = req.params.blogId
@@ -61,11 +65,10 @@ const updateBlogs = async function (req, res) {
         if (!userData) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
-        
         if (!isValidObjectId(blogId)){
             return res.status(404).send({msg: "blog id not available"})
         }
-        if (blogId.length < 24) {
+        if (blogId.length != 24) {
             return res.status(400).send({ msg: "enter valid blog id" })
         }
         let user = await blogsModel.findById(blogId)
@@ -84,36 +87,19 @@ const updateBlogs = async function (req, res) {
 
         if (updateNewBlog.isPublished == true) {
             let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { publishedAt: new String(Date()) })
-
-            if (!update) {
-                return res.status(400).send({ msg: "not updated" })
-            }
         }
 
         if (updateNewBlog.isPublished == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { publishedAt: null })
-
-            if (!update) {
-                return res.status(400).send({ msg: "not updated" })
-            }
         }
 
         if (updateNewBlog.isDeleted == true) {
             res.status(404).send({ status: false, msg: "blog not found" })
-
-            if (!update) {
-                return res.status(400).send({ msg: "not updated" })
-            }
         }
 
         if (updateNewBlog.isDeleted == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { deletedAt: null })
-
-            if (!update) {
-                return res.status(400).send({ msg: "not updated" })
-            }
         }
-        
         return res.status(200).send({ status: true, msg: "blog updated successfuly", data: updateNewBlog  })
     }
     catch (error) {
@@ -122,13 +108,13 @@ const updateBlogs = async function (req, res) {
     }
 }
 
+// DELETE THE BLOG BY BLOG ID IN PATH PARAMS AFTER LOGGING IN
 const deleteBlogs = async function (req, res) {
     try {
         let blogId = req.params.blogId
-        if (blogId.length < 24) {
+        if (blogId.length != 24) {
             return res.status(400).send({msg: "invalid blog id"})
         }
-
         let validBlogId = await blogsModel.findById(blogId)
         if (!isValid(validBlogId)) {
             return res.status(404).send({ msg: "No such blog exists" })
@@ -144,6 +130,7 @@ const deleteBlogs = async function (req, res) {
     }
 }
 
+// DELETE THE BLOG BY USING FILTERS AFTER LOGGING IN
 const queryDeleted = async function (req, res) {
     try {
         let data = req.query;
@@ -154,16 +141,13 @@ const queryDeleted = async function (req, res) {
         if (!isValid(valid)) {
             return res.status(404).send({ status: false, msg: "Data can't be found!!" })
         }
-
         if (!isValid(data)) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
-
         let deleted = await blogsModel.findAndModify(data, { isDeleted: true }, { new: true });
         if (deleted.isDeleted == true) {
             let update = await blogsModel.findAndModify({ _id: blog }, { deletedAt: new String(Date()) });
         }
-
         if (deleted.isDeleted == false) {
             let update = await blogsModel.findAndModify({ _id: blog }, { deletedAt: " " });
         }
@@ -181,4 +165,4 @@ module.exports.createBlogs = createBlogs
 module.exports.getBlogs = getBlogs
 module.exports.deleteBlogs = deleteBlogs
 
-//........................................................
+// ========================END OF CODE===========================

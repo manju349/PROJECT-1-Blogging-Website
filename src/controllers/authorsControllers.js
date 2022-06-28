@@ -2,13 +2,14 @@ const authorModel = require('../models/authorsModel')
 const jwt = require("jsonwebtoken")
 let regex = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
 
-
+// VALIDATION
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
     return true;
 };
 
+// CREATE USER PROFILE
 const createAuthor = async function (req, res) {
     try {
         let author = req.body
@@ -28,7 +29,6 @@ const createAuthor = async function (req, res) {
         let emailCheck = await authorModel.findOne({ email: author.email })
         if (emailCheck) return res.status(400).send({ status: false, msg: "email already used" })
 
-
         if (Object.keys(author).length != 0) {
             let authorCreated = await authorModel.create(author)
             res.status(201).send({ msg: "author successfully created", data: authorCreated  })
@@ -42,6 +42,7 @@ const createAuthor = async function (req, res) {
 module.exports.createAuthor= createAuthor
 
 
+// LOGIN USER
 const authorLogin = async function(req, res){
     try{
         let authorName = req.body.email;
@@ -56,17 +57,15 @@ const authorLogin = async function(req, res){
         if (!password){
             return res.status(400).send({msg: "enter the password"})
         }
-
         let user = await authorModel.findOne({email: authorName, password: password});
         if(!user){
             return res.status(404).send({status: false, msg:"User not Registered, Please Sign Up"});
         }
-
-        let token = jwt.sign(
+        let token = jwt.sign(      // CREATE TOKEN 
             {
                 authorId: user._id.toString()
             },
-            "room-9"
+            "room-9"               // SECRET KEY
         );
         res.setHeader("x-api-key", token);
         return res.status(201).send({status: true, token: token })

@@ -1,12 +1,7 @@
 const jwt = require('jsonwebtoken')
-const ObjectId = require('mongoose').Types.ObjectId
 const blogsModel = require("../models/blogsModel")
 
-let isValidObjectId = function (objectId) {
-    if (!ObjectId.isValid(objectId)) return false;
-    return true;
-}
-
+// AUTHENTICATION BY VERIFYING TOKEN GENERATED DURING LOGIN
 const authentication = function(req, res, next){
     try{
         let token = req.headers["x-api-key"]
@@ -25,10 +20,10 @@ const authentication = function(req, res, next){
         res.status(500).send({msg : error})
     }
 }
-
 module.exports.authentication = authentication
 
 
+// AUTHORISATION USING AUTHOR ID IN TOKEN AND BLOGS (TOKEN IN PATH PARAMS)
 const Authorisation1 = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
@@ -59,6 +54,8 @@ const Authorisation1 = async function (req, res, next) {
 }
 module.exports.Authorisation1 = Authorisation1;
 
+
+// AUTHORISATION USING AUTHOR ID IN TOKEN AND BLOGS (TOKEN IN QUERY PARAMS)
 const Authorisation2 = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
@@ -70,6 +67,7 @@ const Authorisation2 = async function (req, res, next) {
         if (!blogId){
             return res.status(400).send({msg: "enter blog id"})
         }
+
         let decoded = decodedToken.authorId
         let blog = await blogsModel.findById(blogId);
         if (!blog) {
