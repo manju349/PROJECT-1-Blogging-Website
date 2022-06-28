@@ -144,12 +144,12 @@ const queryDeleted = async function (req, res) {
         if (!isValid(data)) {
             return res.status(400).send({ status: false, msg: "Input Missing" });
         }
-        let deleted = await blogsModel.findAndModify(data, { isDeleted: true }, { new: true });
+        let deleted = await blogsModel.findOneAndUpdate(data, { isDeleted: true }, { new: true });
         if (deleted.isDeleted == true) {
-            let update = await blogsModel.findAndModify({ _id: blog }, { deletedAt: new String(Date()) });
+            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: new String(Date()) });
         }
         if (deleted.isDeleted == false) {
-            let update = await blogsModel.findAndModify({ _id: blog }, { deletedAt: " " });
+            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: " " });
         }
         return res.status(200).send({ status: true, msg: "data successfuly deleted", data: deleted });
     }
