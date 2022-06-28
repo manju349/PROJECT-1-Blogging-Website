@@ -45,7 +45,7 @@ const getBlogs = async function (req, res) {
             res.status(404).send({ status: false, msg: "no such blog exist" })
         }
         else {
-            res.status(200).send({ status: true, data: blogsDetails })
+            res.status(200).send({ status: true,data: blogsDetails })
         }
     }
     catch (error) {
@@ -86,7 +86,7 @@ const updateBlogs = async function (req, res) {
         }
 
         if (updateNewBlog.isPublished == true) {
-            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { publishedAt: new String(Date()) })
+            let update = await blogsModel.findOneAndUpdate({ _id: blogId }, { publishedAt: new Date })
         }
 
         if (updateNewBlog.isPublished == false) {
@@ -146,7 +146,7 @@ const queryDeleted = async function (req, res) {
         }
         let deleted = await blogsModel.findOneAndUpdate(data, { isDeleted: true }, { new: true });
         if (deleted.isDeleted == true) {
-            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: new String(Date()) });
+            let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: new Date });
         }
         if (deleted.isDeleted == false) {
             let update = await blogsModel.findOneAndUpdate({ _id: blog }, { deletedAt: " " });
